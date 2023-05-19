@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wiznet News Creater</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.1.4/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css?family=Nanum+Gothic&display=swap');
+        body {
+            font-family: 'Nanum Gothic', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-white min-h-screen p-4">
+    <div class="container max-w-4xl mx-auto">
+        <h1 class="text-4xl text-center text-black mb-8">Wiznet News Creater</h1>
+        <form id="press-release-form" class="p-8 bg-gray-100 rounded">
+            <div class="mb-4">
+                <label class="block text-xl mb-2" for="awardDate">Year, Month</label>
+                <input id="awardDate" name="awardDate" type="month" class="w-full p-2 border border-gray-300 rounded">
+            </div>
+            <div class="mb-4">
+                <label class="block text-xl mb-2" for="awardName">Prize name</label>
+                <input id="awardName" name="awardName" type="text" class="w-full p-2 border border-gray-300 rounded">
+            </div>
+            <div class="mb-4">
+                <label class="block text-xl mb-2" for="firstPlaceLink">1st link</label>
+                <input id="firstPlaceLink" name="firstPlaceLink" type="url" class="w-full p-2 border border-gray-300 rounded">
+            </div>
+            <div class="mb-4">
+                <label class="block text-xl mb-2" for="evaluatorComments">1st Comments</label>
+                <textarea id="evaluatorComments" name="evaluatorComments" class="w-full p-2 border border-gray-300 rounded"></textarea>
+            </div>
+            <div class="mb-4">
+                <label class="block text-xl mb-2" for="secondPlaceLink">2nd link</label>
+                <input id="secondPlaceLink" name="secondPlaceLink" type="url" class="w-full p-2 border border-gray-300 rounded">
+            </div>
+            <div class="mb-4">
+                <label class="block text-xl mb-2" for="thirdPlaceLink">3rd link</label>
+                <input id="thirdPlaceLink" name="thirdPlaceLink" type="url" class="w-full p-2 border border-gray-300 rounded">
+            </div>
+            <button id="submit-btn" class="px-4 py-2 bg-blue-600 text-white rounded shadow" type="submit">Create News</button>
+            <span id="loading-spinner" class="hidden ml-4"><i class="fas fa-spinner fa-spin"></i></span>
+        </form>
+        <div id="output" class="mt-8 bg-gray-100 p-8 rounded break-words hidden">
+        </div>
+        <footer class="text-center mt-8 text-black">
+            <a href="https://maker.wiznet.io/" target="_blank" rel="noopener noreferrer">Created by benjamin ⭐</a>
+        </footer>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $("#press-release-form").submit(function (e) {
+            e.preventDefault();
+
+            const apiURL = "https://a.picoapps.xyz/ask-ai?prompt=";
+            let prompt = `이 앱에 대한 프롬프트입니다: {수상 년도와 월}에 위즈네트에서 열린 {수상 이름 및 목적}의 보도자료를 작성해 주세요. 1등 프로젝트는 {1등 프로젝트 링크}에서 확인할 수 있습니다. 평가자들은 "{평가자 의견}"이라고 말했습니다. 2등과 3등 프로젝트는 각각 {2등 프로젝트 링크}와 {3등 프로젝트 링크}에서 확인할 수 있습니다. `;
+
+            let awardDate = $("#awardDate").val();
+            let awardName = $("#awardName").val();
+            let firstPlaceLink = $("#firstPlaceLink").val();
+            let evaluatorComments = $("#evaluatorComments").val();
+            let secondPlaceLink = $("#secondPlaceLink").val();
+            let thirdPlaceLink = $("#thirdPlaceLink").val();
+
+            prompt = prompt.replace("{수상 년도와 월}", awardDate)
+                .replace("{수상 이름 및 목적}", awardName)
+                .replace("{1등 프로젝트 링크}", firstPlaceLink)
+                .replace("{평가자 의견}", evaluatorComments)
+                .replace("{2등 프로젝트 링크}", secondPlaceLink)
+                .replace("{3등 프로젝트 링크}", thirdPlaceLink);
+
+            console.log(prompt);
+
+            $("#loading-spinner").removeClass("hidden");
+            $("#submit-btn").attr("disabled", true);
+
+            $.getJSON(apiURL + encodeURIComponent(prompt), function (data) {
+                console.log(data.response);
+              let formattedText = data.response.replace(/\n/g, '<br>');
+              formattedText += "<br><br>위즈네트는 아두이노(Arduino), 라즈베리 파이(Raspberry Pi) 등 오픈 하드웨어 플랫폼에서 널리 사용되는 하드웨어(HW) TCP/IP 칩을 생산하는 반도체 팹리스 기업으로 메이커를 위한, 메이커에 의한 ‘사이버 공작소(Cyber Makerspace)’를 만들고 있습니다. 이곳에는 이미 위즈네트 칩을 사용한 3000개 이상의 UCC(사용자 창작 콘텐츠)와 600개 이상의 모듈 제품이 전시되어 있다. 사용자를 위한 UI/UX가 공개되고 공유됩니다.<br><br> 현재는 오픈 하드웨어 개발자를 대상으로 디자인 콘테스트도 활발히 개최하고 있습니다. 라즈베리 파이가 IoT 시장을 겨냥해 야심 차게 내놓은 초저가 MCU인 ‘RP2040’과 함께 위즈네트 ‘W5100S’ 칩을 사용하여 프로토타입을 개발하는 과제입니다.<br><br> 사내 직원은 오픈 하드웨어 커뮤니티에서 매달 2개의 새로운 UCC를 수집해 학습한 내용을 발표해 상을 받을 수 있습니다. 우수자 는 콜럼버스 상을 받으며 UCC를 Chat GPT를 통해 큐레이션하여 만든 콘텐츠(CCC)를 오픈 하드웨어 커뮤니티에 발표하고, 매월 우수작에는 에반젤리스트상이 수여됩니다. <br><br>자세한 내용과 수상자들의 정보는 <a href='https://maker.wiznet.io/' target='_blank' rel='noopener noreferrer'>https://maker.wiznet.io/</a>에서 확인할 수 있습니다.<br><br>이번달 수상작 링크 <br>1. <a href='" + firstPlaceLink + "' target='_blank' rel='noopener noreferrer'>" + firstPlaceLink + "</a><br>2. <a href='" + secondPlaceLink + "' target='_blank' rel='noopener noreferrer'>" + secondPlaceLink + "</a><br>3. <a href='" + thirdPlaceLink + "' target='_blank' rel='noopener noreferrer'>" + thirdPlaceLink;
+              $("#output").html(formattedText);
+              $("#output").removeClass("hidden");
+              $("#loading-spinner").addClass("hidden");
+              $("#submit-btn").attr("disabled", false);
+          });
+        });
+    </script>
+</body>
+</html>
